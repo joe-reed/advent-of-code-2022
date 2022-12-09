@@ -17,9 +17,9 @@ func puzzle2(input []string) (result int) {
 }
 
 func solve(input []string, length int) int {
-	s := Location{0, 0}
+	s := Knot{0, 0}
 
-	rope := lo.Map(lo.Range(length), func(i, j int) Location {
+	rope := lo.Map(lo.Range(length), func(i, j int) Knot {
 		return s
 	})
 
@@ -28,7 +28,7 @@ func solve(input []string, length int) int {
 		return Instruction{split[0], ConvertToInt(split[1])}
 	})
 
-	visited := map[Location]bool{s: true}
+	visited := map[Knot]bool{s: true}
 
 	for _, instr := range instructions {
 		for range lo.Range(instr.dist) {
@@ -46,62 +46,45 @@ func solve(input []string, length int) int {
 	return len(visited)
 }
 
-type Location struct {
+type Knot struct {
 	x, y int
 }
 
-func (l Location) move(dir string) Location {
+func (k Knot) move(dir string) Knot {
 	switch dir {
 	case "U":
-		return Location{l.x, l.y + 1}
+		return Knot{k.x, k.y + 1}
 	case "R":
-		return Location{l.x + 1, l.y}
+		return Knot{k.x + 1, k.y}
 	case "D":
-		return Location{l.x, l.y - 1}
+		return Knot{k.x, k.y - 1}
 	case "L":
-		return Location{l.x - 1, l.y}
-	case "UR":
-		return Location{l.x + 1, l.y + 1}
-	case "UL":
-		return Location{l.x - 1, l.y + 1}
-	case "DR":
-		return Location{l.x + 1, l.y - 1}
-	case "DL":
-		return Location{l.x - 1, l.y - 1}
+		return Knot{k.x - 1, k.y}
 	default:
 		panic("unrecognised direction")
 	}
 }
 
-func (f Location) follow(l Location) Location {
-	if f.isAdjacentTo(l) {
+func (f Knot) follow(k Knot) Knot {
+	if f.isAdjacentTo(k) {
 		return f
 	}
-	if l.y > f.y && l.x > f.x {
-		return f.move("UR")
+	if k.y > f.y {
+		f = f.move("U")
 	}
-	if l.y > f.y && l.x < f.x {
-		return f.move("UL")
+	if k.x < f.x {
+		f = f.move("L")
 	}
-	if l.y < f.y && l.x > f.x {
-		return f.move("DR")
+	if k.y < f.y {
+		f = f.move("D")
 	}
-	if l.y < f.y && l.x < f.x {
-		return f.move("DL")
+	if k.x > f.x {
+		f = f.move("R")
 	}
-	if l.y > f.y {
-		return f.move("U")
-	}
-	if l.y < f.y {
-		return f.move("D")
-	}
-	if l.x > f.x {
-		return f.move("R")
-	}
-	return f.move("L")
+	return f
 }
 
-func (a Location) isAdjacentTo(b Location) bool {
+func (a Knot) isAdjacentTo(b Knot) bool {
 	return math.Abs(float64(a.x-b.x)) <= 1 && math.Abs(float64(a.y-b.y)) <= 1
 }
 
