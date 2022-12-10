@@ -1,0 +1,12 @@
+package main
+
+import (
+	"strings"
+	. "utils"
+
+	"github.com/samber/lo"
+)
+
+func puzzle1(input []string) (result int) {
+	return
+}
