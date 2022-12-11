@@ -10,43 +10,29 @@ import (
 )
 
 func puzzle1(input string) (result int) {
-	monkeys := getMonkeys(input)
-
-	for i := 0; i < 20; i++ {
-		for _, monkey := range monkeys {
-			for len(monkey.items) > 0 {
-				monkey.inspectionCount++
-				newItem := monkey.operation(monkey.items[0])
-				newItem /= 3
-				if newItem%monkey.test == 0 {
-					monkey.throwTo(monkeys[monkey.trueMonkey], newItem)
-				} else {
-					monkey.throwTo(monkeys[monkey.falseMonkey], newItem)
-				}
-			}
-		}
-	}
-
-	return calculateMonkeyBusiness(monkeys)
+	return solve(input, func(i int, monkeys []*Monkey) int {
+		return i / 3
+	}, 20)
 }
 
 func puzzle2(input string) (result int) {
+	return solve(input, func(i int, monkeys []*Monkey) int {
+		return i % lo.Reduce(monkeys, func(carry int, m *Monkey, i int) int {
+			return carry * m.test
+		}, 1)
+	}, 10000)
+}
+
+func solve(input string, adjustForWorry func(int, []*Monkey) int, rounds int) int {
 	monkeys := getMonkeys(input)
 
-	mod := lo.Reduce(monkeys, func(carry int, m *Monkey, i int) int {
-		return carry * m.test
-	}, 1)
-
-	for i := 0; i < 10000; i++ {
-		for _, monkey := range monkeys {
-			for len(monkey.items) > 0 {
-				monkey.inspectionCount++
-				newItem := monkey.operation(monkey.items[0])
-				if newItem%monkey.test == 0 {
-					monkey.throwTo(monkeys[monkey.trueMonkey], newItem%mod)
-				} else {
-					monkey.throwTo(monkeys[monkey.falseMonkey], newItem%mod)
-				}
+	for i := 0; i < rounds; i++ {
+		for _, m := range monkeys {
+			for len(m.items) > 0 {
+				m.inspectionCount++
+				item := m.operation(m.items[0])
+				item = adjustForWorry(item, monkeys)
+				m.throwTo(monkeys[m.getRecipient(item)], item)
 			}
 		}
 	}
@@ -57,13 +43,14 @@ func puzzle2(input string) (result int) {
 func getMonkeys(input string) []*Monkey {
 	return lo.Map(strings.Split(input, "\n\n"), func(monkeyString string, i int) *Monkey {
 		split := strings.Split(monkeyString, "\n")
-
-		items := getItems(split[1])
-		operation := getOperation(split[2])
-		test := getTest(split[3])
-		trueMonkey := getTrueMonkey(split[4])
-		falseMonkey := getFalseMonkey(split[5])
-		return &Monkey{items, operation, test, trueMonkey, falseMonkey, 0}
+		return &Monkey{
+			items:           getItems(split[1]),
+			operation:       getOperation(split[2]),
+			test:            getNumber(split[3]),
+			trueMonkey:      getNumber(split[4]),
+			falseMonkey:     getNumber(split[5]),
+			inspectionCount: 0,
+		}
 	})
 }
 
@@ -73,7 +60,7 @@ func getItems(s string) []int {
 }
 
 func getOperation(s string) func(int) int {
-	matches := regexp.MustCompile(`Operation: new = (.+) (.) (.+)`).FindStringSubmatch(s)
+	matches := regexp.MustCompile(`new = (.+) (.) (.+)`).FindStringSubmatch(s)
 
 	return func(old int) int {
 		a, b := old, old
@@ -95,26 +82,14 @@ func getOperation(s string) func(int) int {
 	}
 }
 
-func getTest(s string) int {
-	matches := regexp.MustCompile(`Test: divisible by (\d+)`).FindStringSubmatch(s)
-	return ConvertToInt(matches[1])
-}
-
-func getTrueMonkey(s string) int {
-	matches := regexp.MustCompile(`If true: throw to monkey (\d+)`).FindStringSubmatch(s)
-	return ConvertToInt(matches[1])
-}
-
-func getFalseMonkey(s string) int {
-	matches := regexp.MustCompile(`If false: throw to monkey (\d+)`).FindStringSubmatch(s)
-	return ConvertToInt(matches[1])
+func getNumber(s string) int {
+	return ConvertToInt(regexp.MustCompile(`(\d+)`).FindStringSubmatch(s)[1])
 }
 
 func calculateMonkeyBusiness(monkeys []*Monkey) int {
 	sort.Slice(monkeys, func(a, b int) bool {
 		return monkeys[a].inspectionCount > monkeys[b].inspectionCount
 	})
-
 	return monkeys[0].inspectionCount * monkeys[1].inspectionCount
 }
 
@@ -126,9 +101,14 @@ type Monkey struct {
 	inspectionCount         int
 }
 
+func (m *Monkey) getRecipient(item int) int {
+	if item%m.test == 0 {
+		return m.trueMonkey
+	}
+	return m.falseMonkey
+}
+
 func (a *Monkey) throwTo(b *Monkey, item int) {
-	items := make([]int, len(a.items)-1)
-	copy(items, a.items[1:])
-	a.items = items
+	a.items = a.items[1:]
 	b.items = append(b.items, item)
 }
