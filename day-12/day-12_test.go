@@ -17,6 +17,10 @@ func TestPuzzle1(t *testing.T) {
 			"./test-input-1.txt",
 			31,
 		},
+		{
+			"./input.txt",
+			449,
+		},
 	}
 
 	for _, test := range tests {
@@ -36,6 +40,10 @@ func TestPuzzle2(t *testing.T) {
 		{
 			"./test-input-1.txt",
 			29,
+		},
+		{
+			"./input.txt",
+			443,
 		},
 	}
 
