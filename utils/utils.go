@@ -26,9 +26,14 @@ func MapToInts(s []string) []int {
 	})
 }
 
-func LoadFile(path string) []string {
+func FileToStrings(path string) []string {
+	str := FileToString(path)
+	lines := strings.Split(str, "\n")
+	return lines[:len(lines)-1]
+}
+
+func FileToString(path string) string {
 	file, err := os.ReadFile(path)
 	Check(err)
-	lines := strings.Split(string(file), "\n")
-	return lines[:len(lines)-1]
+	return string(file)
 }

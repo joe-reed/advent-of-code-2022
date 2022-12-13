@@ -24,12 +24,12 @@ func TestPuzzle1(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.expected, puzzle1(LoadFile(test.input)))
+		assert.Equal(t, test.expected, puzzle1(FileToStrings(test.input)))
 	}
 }
 
 func TestSolvePuzzle1(t *testing.T) {
-	fmt.Println("Puzzle 1:", puzzle1(LoadFile("./input.txt")))
+	fmt.Println("Puzzle 1:", puzzle1(FileToStrings("./input.txt")))
 }
 
 func TestPuzzle2(t *testing.T) {
@@ -48,10 +48,10 @@ func TestPuzzle2(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.expected, puzzle2(LoadFile(test.input)))
+		assert.Equal(t, test.expected, puzzle2(FileToStrings(test.input)))
 	}
 }
 
 func TestSolvePuzzle2(t *testing.T) {
-	fmt.Println("Puzzle 2:", puzzle2(LoadFile("./input.txt")))
+	fmt.Println("Puzzle 2:", puzzle2(FileToStrings("./input.txt")))
 }

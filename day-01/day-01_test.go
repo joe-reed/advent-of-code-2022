@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"testing"
 	. "utils"
 
@@ -25,12 +24,12 @@ func TestPuzzle1(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.expected, puzzle1(openFile(test.input)))
+		assert.Equal(t, test.expected, puzzle1(FileToString(test.input)))
 	}
 }
 
 func TestSolvePuzzle1(t *testing.T) {
-	fmt.Println("Puzzle 1:", puzzle1(openFile("./input.txt")))
+	fmt.Println("Puzzle 1:", puzzle1(FileToString("./input.txt")))
 }
 
 func TestPuzzle2(t *testing.T) {
@@ -49,16 +48,10 @@ func TestPuzzle2(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.expected, puzzle2(openFile(test.input)))
+		assert.Equal(t, test.expected, puzzle2(FileToString(test.input)))
 	}
 }
 
 func TestSolvePuzzle2(t *testing.T) {
-	fmt.Println("Puzzle 2:", puzzle2(openFile("./input.txt")))
-}
-
-func openFile(path string) string {
-	file, err := os.ReadFile(path)
-	Check(err)
-	return string(file)
+	fmt.Println("Puzzle 2:", puzzle2(FileToString("./input.txt")))
 }
