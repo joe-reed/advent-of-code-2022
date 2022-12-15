@@ -7,7 +7,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func puzzle1(input string) (result int) {
+func puzzle1(input string) int {
 	grid, maxY := getGrid(input)
 
 	return simulateSand(grid, func(sand Coordinate) bool {
